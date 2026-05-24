@@ -1,0 +1,16 @@
+# Core — fine-tuned XLM-R run (Run 2)
+torch>=2.1
+transformers>=4.40
+numpy
+scikit-learn
+
+# Knowledge graph construction (Wikidata SPARQL)
+SPARQLWrapper
+requests
+
+# Claude runs (Run 1 and Run 3) use only the standard library for the API call
+# (urllib). An Anthropic API key must be provided via the ANTHROPIC_API_KEY
+# environment variable.
+
+# Optional: progress bars / data handling used by some scripts
+tqdm
