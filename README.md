@@ -19,34 +19,38 @@ We submitted three runs:
 A short description of each run is in our CLEF 2026 working notes paper
 (citation below).
 
-## Repository layout
+## Files
 
-```
-claude/                     Runs 1 and 3 (prompted Claude Sonnet 4)
-  pipeline_v8.py            Run 1 prompt: newspaper-oriented, KG facts, PROBABLE few-shots
-  pipeline_v8_literary.py   Run 3 prompt: domain-agnostic (historical/literary)
-  apply_kg_rules.py         Post-processing: "unborn -> FALSE" + consistency fix
-  submit_test_claude.sh     Driver script for the Claude runs
+All files live in the repository root.
 
-xlmr/                       Run 2 (fine-tuned encoder)
-  hipe_model_fol.py         XLM-R + KG/FOL feature fusion + logic-constrained loss
-  hipe_dataset_fol.py       Dataset: 16 Wikidata features + 6 text-pattern features
-  hipe_dataset.py           Earlier dataset variant (no FOL text-pattern features)
-  train_xlmr_fol.py         Training entry point
-  predict_xlmr_fol.py       Inference entry point
-  hipe_train_fol_v2.sbatch  SLURM job used to train the submitted checkpoint
-  submit_test_xlmr.sbatch   SLURM job for test-set inference
+**Runs 1 and 3 — prompted Claude Sonnet 4:**
 
-kg/                         Knowledge graph
-  kg_reasoner.py            Builds the Wikidata cache and per-pair fact records
-  wikidata_enrich.py        Wikidata SPARQL enrichment helpers
+- `pipeline_v8.py` — Run 1 prompt: newspaper-oriented, KG facts, PROBABLE few-shots
+- `pipeline_v8_literary.py` — Run 3 prompt: domain-agnostic (historical/literary)
+- `apply_kg_rules.py` — post-processing: "unborn → FALSE" + consistency fix
+- `submit_test_claude.sh` — driver script for the Claude runs
 
-artifacts/                  Derived files (for reproducibility)
-  wikidata_cache.json       Cached Wikidata facts (persons + locations)
-  kg_facts.jsonl            Per-pair fact records
-  kg_facts_persons.jsonl    Per-person fact records
-  kg_facts_locations.jsonl  Per-location fact records
-```
+**Run 2 — fine-tuned encoder:**
+
+- `hipe_model_fol.py` — XLM-R + KG/FOL feature fusion + logic-constrained loss
+- `hipe_dataset_fol.py` — dataset: 16 Wikidata features + 6 text-pattern features
+- `hipe_dataset.py` — earlier dataset variant (no FOL text-pattern features)
+- `train_xlmr_fol.py` — training entry point
+- `predict_xlmr_fol.py` — inference entry point
+- `hipe_train_fol_v2.sbatch` — SLURM job used to train the submitted checkpoint
+- `submit_test_xlmr.sbatch` — SLURM job for test-set inference
+
+**Knowledge graph:**
+
+- `kg_reasoner.py` — builds the Wikidata cache and per-pair fact records
+- `wikidata_enrich.py` — Wikidata SPARQL enrichment helpers
+
+**Cached artifacts (for reproducibility):**
+
+- `wikidata_cache.json` — cached Wikidata facts (persons + locations)
+- `kg_facts.jsonl` — per-pair fact records
+- `kg_facts_persons.jsonl` — per-person fact records
+- `kg_facts_locations.jsonl` — per-location fact records
 
 ## Setup
 
@@ -68,33 +72,33 @@ export ANTHROPIC_API_KEY=...   # never commit this
 
 **Run 1 (Claude, newspaper prompt):**
 ```bash
-python claude/pipeline_v8.py --mode predict \
+python pipeline_v8.py --mode predict \
     --input_file <test-file>.jsonl \
-    --wikidata artifacts/wikidata_cache.json \
+    --wikidata wikidata_cache.json \
     --api_key "$ANTHROPIC_API_KEY" \
     --output_dir out_run1
-python claude/apply_kg_rules.py \
-    --input out_run1/*.jsonl --kg_facts artifacts/kg_facts.jsonl \
+python apply_kg_rules.py \
+    --input out_run1/*.jsonl --kg_facts kg_facts.jsonl \
     --output_dir out_run1_rules
 ```
 
 **Run 2 (XLM-R, fine-tuned):**
 ```bash
 # Train (SLURM)
-sbatch xlmr/hipe_train_fol_v2.sbatch
+sbatch hipe_train_fol_v2.sbatch
 # Predict
-python xlmr/predict_xlmr_fol.py \
+python predict_xlmr_fol.py \
     --checkpoint <run-dir>/best.pt \
     --input <test-file>.jsonl \
-    --kg_facts artifacts/kg_facts.jsonl \
+    --kg_facts kg_facts.jsonl \
     --output out_run2.jsonl
 ```
 
 **Run 3 (Claude, domain-agnostic prompt):**
 ```bash
-python claude/pipeline_v8_literary.py --mode predict \
+python pipeline_v8_literary.py --mode predict \
     --input_file <test-file>.jsonl \
-    --wikidata artifacts/wikidata_cache.json \
+    --wikidata wikidata_cache.json \
     --api_key "$ANTHROPIC_API_KEY" \
     --output_dir out_run3
 ```
@@ -116,4 +120,4 @@ Please also cite the HIPE-2026 shared task overview papers.
 
 ## License
 
-This code is released under the MIT License (see `LICENSE`).
+This code is released under the MIT License (see `LICENSE`).s
