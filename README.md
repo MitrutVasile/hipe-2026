@@ -31,6 +31,7 @@ claude/                     Runs 1 and 3 (prompted Claude Sonnet 4)
 xlmr/                       Run 2 (fine-tuned encoder)
   hipe_model_fol.py         XLM-R + KG/FOL feature fusion + logic-constrained loss
   hipe_dataset_fol.py       Dataset: 16 Wikidata features + 6 text-pattern features
+  hipe_dataset.py           Earlier dataset variant (no FOL text-pattern features)
   train_xlmr_fol.py         Training entry point
   predict_xlmr_fol.py       Inference entry point
   hipe_train_fol_v2.sbatch  SLURM job used to train the submitted checkpoint
@@ -40,12 +41,11 @@ kg/                         Knowledge graph
   kg_reasoner.py            Builds the Wikidata cache and per-pair fact records
   wikidata_enrich.py        Wikidata SPARQL enrichment helpers
 
-scripts/
-  package_submission.sh     Renames predictions to the HIPE naming convention + zips
-
-artifacts/                  Small derived files (optional, for reproducibility)
+artifacts/                  Derived files (for reproducibility)
   wikidata_cache.json       Cached Wikidata facts (persons + locations)
-  kg_facts*.jsonl           Per-entity / per-pair fact records
+  kg_facts.jsonl            Per-pair fact records
+  kg_facts_persons.jsonl    Per-person fact records
+  kg_facts_locations.jsonl  Per-location fact records
 ```
 
 ## Setup
@@ -99,11 +99,6 @@ python claude/pipeline_v8_literary.py --mode predict \
     --output_dir out_run3
 ```
 
-## Model checkpoint
-
-The fine-tuned Run 2 checkpoint (~2.1 GB) is too large for this repository.
-<!-- TODO: upload to Hugging Face Hub or Zenodo and put the link here. -->
-
 ## Citation
 
 <!-- TODO: replace with the final BibTeX once the paper is published. -->
@@ -111,14 +106,14 @@ The fine-tuned Run 2 checkpoint (~2.1 GB) is too large for this repository.
 @inproceedings{awakened-hipe2026,
   title     = {Team Awakened at HIPE-2026: Knowledge-Augmented Prompting and
                Logic-Constrained Fine-Tuning for Person--Place Relation Extraction},
-  author    = {Vasile, Dragoș-Mitruț},
+  author    = {Vasile, Dragoș-Mitruț and Apostol, Elena-Simona and Truică, Ciprian-Octavian},
   booktitle = {CLEF 2026 Working Notes},
   year      = {2026},
 }
 ```
 
-Please also cite the HIPE-2026 shared task overview paper.
+Please also cite the HIPE-2026 shared task overview papers.
 
 ## License
 
-<!-- TODO: pick a license (MIT or Apache-2.0 recommended) and add a LICENSE file. -->
+This code is released under the MIT License (see `LICENSE`).
